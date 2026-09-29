@@ -28,6 +28,7 @@ pub enum LanguageId {
     Go,
     Ruby,
     Shell,
+    Swift
 }
 
 impl LanguageId {
@@ -47,6 +48,7 @@ impl LanguageId {
             "go" => Some(Self::Go),
             "rb" | "rake" | "gemspec" | "ru" | "podspec" => Some(Self::Ruby),
             "sh" | "bash" | "zsh" | "ksh" | "bats" | "ebuild" | "eclass" => Some(Self::Shell),
+            "swift" => Some(Self::Swift),
             _ => None,
         }
     }
@@ -110,6 +112,7 @@ impl LanguageId {
             Self::Go => "go",
             Self::Ruby => "ruby",
             Self::Shell => "shellscript",
+            Self::Swift => "swift"
         }
     }
 }
@@ -180,6 +183,7 @@ impl MultiLspManager {
             LanguageId::Go,
             LanguageId::Ruby,
             LanguageId::Shell,
+            LanguageId::Swift,
         ]
         .into_iter()
         .find(|lang| {
@@ -375,6 +379,7 @@ impl MultiLspManager {
         go_config: LspServerConfig,
         ruby_config: LspServerConfig,
         shell_config: LspServerConfig,
+        swift_config: LspServerConfig,
     ) -> Self {
         let mut configs = HashMap::new();
         configs.insert(LanguageId::Rust, rust_config);
@@ -390,7 +395,8 @@ impl MultiLspManager {
         configs.insert(LanguageId::Go, go_config);
         configs.insert(LanguageId::Ruby, ruby_config);
         configs.insert(LanguageId::Shell, shell_config);
-
+        configs.insert(LanguageId::Swift, swift_config);
+        
         Self {
             instances: HashMap::new(),
             configs,

@@ -133,6 +133,7 @@ impl SyntaxManager {
             Some("py") | Some("pyi") | Some("pyw") => self.set_python_language(),
             Some("php") => self.set_php_language(),
             Some("go") => self.set_go_language(),
+            Some("swift") => self.set_swift_language(),
             _ => {
                 if first_line.is_some_and(shebang_is_shell) {
                     self.set_shell_language();
@@ -547,7 +548,30 @@ impl SyntaxManager {
             }
         }
     }
+    
+    fn set_swift_language(&mut self) {
+        let language = tree_sitter_swift::LANGUAGE;
+        match self.parser.set_language(&language.into()) {
+            Ok(()) => {
+                self.language = Some("swift".to_string());
 
+                let query_source = highlighter::swift_highlight_query();
+                match Query::new(&language.into(), query_source) {
+                    Ok(query) => {
+                        self.query = Some(query);
+                    }
+                    Err(e) => {
+                        self.language = Some(format!("swift (query error: {:?})", e));
+                        self.query = None;
+                    }
+                }
+            }
+            Err(e) => {
+                self.language = Some(format!("swift (lang error: {:?})", e));
+            }
+        }
+    }
+    
     /// Parse the buffer. Reuses the previous tree via tree-sitter's
     /// incremental parsing when the buffer's recorded edits exactly cover
     /// the span since the last parse; otherwise falls back to a full parse.
